@@ -1,0 +1,17 @@
+# AaronMcHale/web-router
+
+I'm making my Traefik configs public, along with various supporting services.
+
+This is a work in progress, based on months of tweaking and configuring in a private repository. I'm moving everything over, but also making some changes.
+
+Where it makes sense, I want everything to be configurable using environment variables. Even being able to turn on and off specific services. Because not every service needs to be enabled on every environment. My ultimate goal is to streamline the process of hosting applications, and reduce repeating services.
+
+Here are some of my objectives:
+
+* As said, using environment variables to configure things.
+* Creating a logical separation of concerns, splitting up each service into its own folder.
+* Security by design, you shall not run as root!
+* Add automated tests for everything (or at least try to)!
+* Use this on production, but also for local development. That means I'll be adding things like, being able to swap between Let's Encrypt and [mkcert](https://github.com/FiloSottile/mkcert) depending on the environment.
+* The actual applications that I'm hosting should not need any modifications depending on the environment. For example, I'm going to add an SMTP server, which means something like Postfix will be used on production, but for local development something like [Mailhog](https://hub.docker.com/r/mailhog/mailhog/), so that outgoing mail is captured. This should be totally transparent to the applications being ran, in other words the SMTP host and credentials should be the same.
+* Similarly, this repository will provide services, like SMTP, so that each application doesn't have to, streamlining things and reducing boilerplate code/config in every application.
