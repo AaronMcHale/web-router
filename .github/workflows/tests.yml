@@ -12,5 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Pull images used during tests
+        run: docker pull nginx
       - name: Run tests
         run: cd tests && ./run.sh
