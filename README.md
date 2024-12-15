@@ -41,7 +41,7 @@ Note that a Docker Compose project must add the networks they want to join to th
 <details>
 <summary>Example nginx service joining the web-router network to expose itself to Traefik</summary>
 
-An `nginx` service which defines Traefik labels must join the `web-router` network and set `web-router` as `external: true`.
+This `documer-compose.yml` file provides an example `nginx` service which joins the `web-router` network and adds the `traefik.enable` label, which tells Traefik to listen to this container. To join the `web-router` network, the Compose file must declare `web-router` as `external`, since in this case `web-router` is provided by the `web-router` project.
 
 ```
 # docker-compose.yml
