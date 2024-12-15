@@ -28,6 +28,36 @@ To do this, in your terminal run:
 ```
 This will setup the required environment variables.
 
+## Networks
+
+The following networks are always available. Services from other docker projects can join these networks, and must do so if they want to use and be available to the relevant service.
+
+Note that a Docker Compose project must add the networks they want to join to their Compose file and setting each network as `external`. An example is provided below the table.
+
+| Network name | Purpose |
+| ------------ | ------- |
+| `web-router` | Services which want to be exposed through Traefik on the web should join this network. |
+
+<details>
+<summary>Example nginx service joining the web-router network to expose itself to Traefik</summary>
+
+This `documer-compose.yml` file provides an example `nginx` service which joins the `web-router` network and adds the `traefik.enable` label, which tells Traefik to listen to this container. To join the `web-router` network, the Compose file must declare `web-router` as `external`, since in this case `web-router` is provided by the `web-router` project.
+
+```
+# docker-compose.yml
+networks:
+  web-router:
+    external: true
+services:
+  nginx:
+    image: nginx
+    networks: [ web-router ]
+    labels:
+      traefik.enable: true
+```
+</details>
+
+
 ## Tests
 
 To run tests locally, in your terminal run:
