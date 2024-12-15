@@ -1,7 +1,7 @@
-# Docker Compose file for using during test-networks test.
+# Docker Compose file used during test-networks test.
 #
-# Unlike the `docker-compose.test-web-router.yml` compose file, this one is designed
-# to be ran on its own. We are testing that an nginx container can join the web-router
+# Unlike the `docker-compose.test-web-router.yml` Compose file, this one is designed
+# to be run on its own. We are testing that an nginx container can join the web-router
 # network externally.
 networks:
   web-router:
