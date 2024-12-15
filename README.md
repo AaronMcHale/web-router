@@ -30,9 +30,9 @@ This will setup the required environment variables.
 
 ## Networks
 
-The following networks are always available. Services from other docker projects can join these networks, and must do so to use the relevant service.
+The following networks are always available. Services from other docker projects can join these networks, and must do so if they want to use and be available to the relevant service.
 
-Note that a Docker Compose project must add the networks to its `docker-compose` file, setting them as `external`. An example is provided below the table.
+Note that a Docker Compose project must add the networks they want to join to their Compose file and setting each network as `external`. An example is provided below the table.
 
 | Network name | Purpose |
 | ------------ | ------- |
