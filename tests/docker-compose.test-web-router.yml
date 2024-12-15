@@ -1,0 +1,9 @@
+# Docker Compose file for using during test-networks test.
+#
+# This compose file is used with the top-level docker-compose file to hae a
+# nginx container join the web-router network, as the top-level docker-compose
+# file will not run on its own since it does not define any services.
+services:
+  nginx:
+    image: nginx
+    networks: [ web-router ]

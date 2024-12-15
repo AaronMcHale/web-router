@@ -1,0 +1,26 @@
+# Top-level docker compose file.
+#
+# Each service has its own docker-compose.yml file, services are stored in
+# folders under the `services` folder. The `COMPOSE_FILE` environment
+# variable is used to tell docker to load all of the compose files that
+# are in use. The `COMPOSE_FILE` variable is set in the `env.sh` script.
+#
+# This separation allows services to be enabled/disabled as required per
+# environment. It also provides a logical way to group together all relevant
+# resources required for running each service.
+
+# Networks
+# --------
+#
+# Networks which we make available to other docker containers running on this
+# host are defined here. This avoids services from other docker containers
+# failing to start if we don't have the service enabled which defines these.
+# For example, if traefik is not enabled, by defining the `web` network here
+# those services will still start.
+networks:
+  # Traefik network.
+  # Any services on the host which want to be available through Traefik must
+  # join the `web-router` network.
+  web-router:
+    driver: bridge
+    name: web-router
