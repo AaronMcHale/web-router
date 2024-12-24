@@ -17,7 +17,7 @@ if [ -x "$test_service_dir" ]; then
   echo "Error: test service already exists at ""$test_service_dir"; exit 1
 fi
 echo "mkdir ""$test_service_dir"
-mkdir "$test_service_dir"
+mkdir -p "$test_service_dir"
 echo -e "OK\n"
 
 echo "Creating defaults.env.sh for test service..."
