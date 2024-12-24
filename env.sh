@@ -5,16 +5,24 @@
 #
 # Refer to the `README.md` for more information.
 
-# Clear any previously stored values for known variables.
-unset \
-  PUID \
-  PGID
-
+# User and group ID
+# -----------------
 # Get the ID of the current user and user's group.
 # These are used to run containers as the current user.
 export PUID="$(id -u)"
 export PGID="$(id -g)"
 
+# Set defaults for services
+# -------------------------
+for service in ./services/*; do
+  if [ -f "$service""/defaults.env.sh" ]; then
+    . "$service""/defaults.env.sh"
+    echo "$service""/defaults.env.sh"
+  fi
+done
+
+# Load .env
+# ---------
 if [ -f ".env" ]; then
   # Source the .env file but ignore comments and blank lines
   export $(grep '^[[:blank:]]*[^[:blank:]#]' .env | xargs)
