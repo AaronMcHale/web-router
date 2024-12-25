@@ -250,6 +250,15 @@ echo "Wrote to ""$defaults_env_sh_path:"
 cat "$defaults_env_sh_path"
 echo -e "OK\n"
 
+echo "Testing that COMPOSE_FILE env variable does not contain service's docker-compose.yml..."
+cd ..
+. env.sh
+cd tests
+if [ "$(echo $COMPOSE_FILE | grep $test_service_name)" ]; then
+  echo "Error: COMPOSE_FILE environment variable contains reference to test service, COMPOSE_FILE is: ""$COMPOSE_FILE"; exit 1
+fi
+echo -e "OK\n"
+
 echo "Copying docker-compose.test-dynamic-service-loading.yml as docker-compose.yml"
 service_compose_file="$test_service_dir""/docker-compose.yml"
 cp "./docker-compose.test-dynamic-service-loading.yml" "$service_compose_file"
