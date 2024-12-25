@@ -16,11 +16,10 @@ export PGID="$(id -g)"
 # -------------------------
 export COMPOSE_FILE="docker-compose.yml"
 for service in ./services/*; do
-  if [ "$service" = "./services/*" ]; then
-    # If $service = ./services/* it means it couldn't find any services
-    break
-  fi
-  if [ -f "$service""/defaults.env.sh" ]; then
+  # Check `$service` is actually a directory, avoids trying to load
+  # regular files, and if the `services` directory doesn't exist
+  # `$service` could be "./services/*".
+  if [ -d "$service" ] && [ -f "$service""/defaults.env.sh" ]; then
     . "$service""/defaults.env.sh"
   fi
 done
@@ -38,9 +37,11 @@ fi
 # Load services
 # -------------
 for service in ./services/*; do
-  if [ "$service" = "./services/*" ]; then
-    # If $service = ./services/* it means it couldn't find any services
-    break
+  # Check `$service` is actually a directory, avoids trying to load
+  # regular files, and if the `services` directory doesn't exist
+  # `$service` could be the literal text "./services/*".
+  if [ ! -d "$service" ]; then
+    continue
   fi
   service_name="${service##*/}"
   service_is_enabled_var_name="SERVICE_ENABLED_""${service_name^^}"
