@@ -28,6 +28,12 @@ To do this, in your terminal run:
 ```
 This will setup the required environment variables.
 
+## Services
+
+Services are grouped into service folders, along with all of their resources. Services can be enabled and disabled using environment variables. All services exist under the `services` directory.
+
+[Learn more about how services work in the services README.md](services/README.md)
+
 ## Networks
 
 The following networks are always available. Services from other docker projects can join these networks, and must do so if they want to use and be available to the relevant service.
