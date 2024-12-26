@@ -293,3 +293,21 @@ fi
 docker compose down
 cd tests
 echo -e "OK\n"
+
+# Confirm that env.sh is sourced after COMPOSE_FILE is updated
+# ------------------------------------------------------------
+
+echo "Test that env.sh is sourced after docker-compose.yml is added to COMPOSE_FILE..."
+test_compose_file_updated_var_name="${test_service_name^^}""_COMPOSE_FILE_UPDATED"
+cat <<EOF > "$test_service_dir""/env.sh"
+if [ \$(echo "$COMPOSE_FILE" | grep $compose_file_root_rel_path) ]; then
+  export $test_compose_file_updated_var_name=1
+fi
+EOF
+cd ..
+. env.sh
+cd tests
+if [ ! $(env | grep ^"$test_compose_file_updated_var_name""=1" ) ]; then
+  echo "Error: COMPOSE_FILE does not appear to have been updated before the test service's env.sh was sourced; grep did not find anything for ""$test_compose_file_updated_var_name""=1"; exit 1
+fi
+echo -e "OK\n"
