@@ -6,5 +6,5 @@
 # is copied with the name `docker-compose.yml`.
 services:
   test-dynamic-service-loading-nginx:
-    image: nginx
+    image: nginx:alpine
     networks: [ web-router ]

@@ -8,6 +8,6 @@ networks:
     external: true
 services:
   nginx:
-    image: nginx
+    image: nginx:alpine
     container_name: web-router-test-networks-nginx
     networks: [ web-router ]
