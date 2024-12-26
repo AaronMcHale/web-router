@@ -5,5 +5,5 @@
 # file will not run on its own since it does not define any services.
 services:
   nginx:
-    image: nginx
+    image: nginx:alpine
     networks: [ web-router ]
