@@ -16,5 +16,10 @@ run_test() {
 }
 
 # Run tests
+if [ -n "${1-}" ] && [ -f "$1" ]; then
+  run_test "$1"
+  exit
+fi
 run_test test-env-sh.sh
 run_test test-networks.sh
+run_test test-dynamic-service-loading.sh

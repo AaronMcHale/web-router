@@ -1,0 +1,10 @@
+# Docker Compose file used during test-dynamic-service-loading test.
+#
+# This compose file is used to test that a service's docker-compose.yml is
+# automatically loaded. This file is copied to the test service's directory
+# which is created with a random name during the test then deleted. The file
+# is copied with the name `docker-compose.yml`.
+services:
+  test-dynamic-service-loading-nginx:
+    image: nginx
+    networks: [ web-router ]
