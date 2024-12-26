@@ -304,10 +304,14 @@ if [ \$(echo "$COMPOSE_FILE" | grep $compose_file_root_rel_path) ]; then
   export $test_compose_file_updated_var_name=1
 fi
 EOF
+echo "Wrote to ""$test_service_dir""/env.sh:"
+cat "$test_service_dir""/env.sh"
 cd ..
 . env.sh
 cd tests
 if [ ! $(env | grep ^"$test_compose_file_updated_var_name""=1" ) ]; then
   echo "Error: COMPOSE_FILE does not appear to have been updated before the test service's env.sh was sourced; grep did not find anything for ""$test_compose_file_updated_var_name""=1"; exit 1
 fi
+echo "Testing: env | grep ^""$test_compose_file_updated_var_name""=1"
+env | grep ^"$test_compose_file_updated_var_name""=1"
 echo -e "OK\n"
