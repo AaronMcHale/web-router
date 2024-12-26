@@ -1,0 +1,29 @@
+# Docker Compose file used during test-traefik-docker-proxy tests.
+#
+# We define two services:
+# - `test-traefik-docker-proxy-ping` aka `ping`
+# - `test-traefik-docker-proxy-pong` aka `pong`
+# Essentially what we're doing in tests is running docker commands on the
+# `ping` container which target the `pong` container. Basically playing
+# a game of ping pong.
+#
+# We need these containers to continue running, nginx seems to be our go
+# to process when we need a lightweight container that will keep running
+# and not exist immediately.
+services:
+  test-traefik-docker-proxy-ping:
+    build:
+      context: ./tests/traefik
+      dockerfile_inline: |
+        FROM nginx:alpine
+        RUN apk update && apk add bash docker-cli
+        COPY test-traefik-docker-proxy-in-container-script.sh /
+        RUN chmod +x /test-traefik-docker-proxy-in-container-script.sh
+    environment:
+      DOCKER_HOST: 'tcp://traefik-docker-proxy:2375'
+    networks: [ traefik_internal ]
+
+  test-traefik-docker-proxy-pong:
+    image: nginx:alpine
+    container_name: test-traefik-docker-proxy-pong
+    networks: [ traefik_internal ]

@@ -62,7 +62,7 @@ echo "DEFAULT_ENV_SH_TEST is ""$test_service_name"
 echo -e "OK\n"
 
 echo "Testing .env to override DEFAULT_ENV_SH_TEST..."
-echo -e "\nDEFAULT_ENV_SH_TEST=value_changed" >> ../.env
+echo "DEFAULT_ENV_SH_TEST=value_changed" >> ../.env
 cd ..
 . env.sh
 cd tests
