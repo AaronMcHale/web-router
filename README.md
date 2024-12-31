@@ -34,6 +34,26 @@ Services are grouped into service folders, along with all of their resources. Se
 
 [Learn more about how services work in the services README.md](services/README.md)
 
+## Environment variables
+
+Environment variables can be set in a `.env` file, the `env.sh` script will load the env file and export variables.
+
+The env file may include blank lines and comments, comments must be prefixed with a `#`.
+
+<details>
+<summary>Specifying an alternative env file</summary>
+
+The `env.sh` script supports providing an alternative location for the env file.
+
+This can be done by setting the `ENV_FILE` environment variable to the name of the file, prior to sourcing the `env.sh` script. If set, `env.sh` will load the specified file instead of loading `.env`.
+
+For example, if you want `env.sh` to load environment variables from `.env-example`, rather than `.env`:
+```
+export ENV_FILE='.env-example'
+. env.sh
+```
+</details>
+
 ## Networks
 
 The following networks are always available. Services from other docker projects can join these networks, and must do so if they want to use and be available to the relevant service.

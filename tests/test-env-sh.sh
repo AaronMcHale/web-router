@@ -44,3 +44,17 @@ if [ "$TESTING" != "testing" ]; then
   echo "Error: \$TESTING is not set to expected string: \$TESTING is $TESTING; expected string \"testing\""; exit 1
 fi
 echo -e "OK\n"
+
+echo "Testing setting ENV_FILE..."
+unset ENV_FILE
+export ENV_FILE='.test-env-sh.env'
+echo 'ENV_FILE='"$ENV_FILE"
+test_var_val="$RANDOM"
+echo 'TESTING_ALT_ENV_FILE='"${test_var_val-}" > "$ENV_FILE"
+cat "$ENV_FILE"
+. ../env.sh
+if [ "${TESTING_ALT_ENV_FILE-}" != "${test_var_val-}" ]; then
+  echo 'Error: expected $TESTING_ALT_ENV_FILE to be: '"${test_var_val-}"'; actual value: '"${TESTING_ALT_ENV_FILE-}"; exit 1
+fi
+rm "$ENV_FILE"
+echo -e "OK\n"
