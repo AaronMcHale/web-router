@@ -26,12 +26,12 @@ done
 
 # Load .env
 # ---------
-if [ -f ".env" ]; then
-  # Source the .env file but ignore comments and blank lines
-  export $(grep '^[[:blank:]]*[^[:blank:]#]' .env | xargs)
-else
-  # Warn if .env file doesn't exist
-  echo "WARNING: .env does not exist."
+if [ -z "${ENV_FILE-}" ]; then
+  export ENV_FILE='.env'
+fi
+if [ -f "$ENV_FILE" ]; then
+  # Source the env file but ignore comments and blank lines
+  export $(grep '^[[:blank:]]*[^[:blank:]#]' "$ENV_FILE" | xargs)
 fi
 
 # Load services
