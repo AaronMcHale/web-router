@@ -48,7 +48,7 @@ echo -e "OK\n"
 echo "Test Traefik can discover Docker containers..."
 export COMPOSE_FILE="$COMPOSE_FILE"":tests/traefik/docker-compose.test-traefik-docker-discovery.yml"
 docker compose up -d
-sleep 2 # give a little time f or the route to be registered
+sleep 2 # give a little time for the route to be registered
 curl_url="http://""$DEFAULT_DOMAIN""/api/http/routers/test-traefik-docker-discovery@docker"
 set +e; output="$(curl ""$curl_url"" 2>&1)"; set -e
 if [ ! "$(echo $output | grep 'enabled' )" ]; then
