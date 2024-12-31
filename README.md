@@ -43,9 +43,13 @@ Services are grouped into service folders, along with all of their resources. Al
 
 ## Environment variables
 
-The following environment variables can be set in the `.env` file.
+Environment variables can be set in a `.env` file, the `env.sh` script will load the env file and export variables.
 
-Default values are provided for all of these variables, so it is not required to include all of these in a `.env` file, only the variables that need to be changed.
+The env file may include blank lines and comments, comments must be prefixed with a `#`.
+
+The following environment variables can be used to configure different parts of web-router.
+
+Default values are provided for all of these variables, so it is not required to include all of these in the `.env` file, only the variables that need to be changed.
 
 | Variable name | Default value | Description |
 | ------------- | ------------- | ----------- |
@@ -54,6 +58,20 @@ Default values are provided for all of these variables, so it is not required to
 | `DOCKER_SOCKET_PATH` | `/var/run/docker.sock` | The path to the docker socket on the host, this is mounted inside the `traefik-docker-proxy` container. To increase security, Traefik never has full direct access to the socket, the proxy container grants read access to only what Traefik needs. |
 | `TRAEFIK_API_DASHBOARD` | `1` | Whether the Traefik API and Dashboard are enabled, set to `0` to disable. |
 | `TRAEFIK_LOG_LEVEL` | `ERROR` | [Log level values can be found in the Traefik documentation](https://doc.traefik.io/traefik/observability/logs/#level) |
+
+<details>
+<summary>Specifying an alternative env file</summary>
+
+The `env.sh` script supports providing an alternative location for the env file.
+
+This can be done by setting the `ENV_FILE` environment variable to the name of the file, prior to sourcing the `env.sh` script. If set, `env.sh` will load the specified file instead of loading `.env`.
+
+For example, if you want `env.sh` to load environment variables from `.env-example`, rather than `.env`:
+```
+export ENV_FILE='.env-example'
+. env.sh
+```
+</details>
 
 ## Networks
 
