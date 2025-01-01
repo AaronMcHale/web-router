@@ -75,11 +75,6 @@ if [ "${QUOTE_TESTING-}" = 'testing' ]; then
 else
   echo 'Error: expected QUOTE_TESTING to be: testing; actual value: '"${QUOTE_TESTING-}"
 fi
-if [ "${QUOTE_TESTING-}" = 'testing' ]; then
-  echo 'QUOTE_TESTING='"$QUOTE_TESTING"
-else
-  echo 'Error: expected QUOTE_TESTING to be: testing; actual value: '"${QUOTE_TESTING-}"
-fi
 if [ "${SPACE_TESTING-}" = 'test1' ]; then
   echo 'SPACE_TESTING='"$SPACE_TESTING"
 else
