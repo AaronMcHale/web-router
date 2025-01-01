@@ -3,7 +3,6 @@ clean_exit() {
   if [ -n "$test_service_dir" ] && [ -x "$test_service_dir" ]; then
     rm -rf "$test_service_dir"
   fi
-  docker compose down
 }
 trap clean_exit EXIT
 
