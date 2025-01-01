@@ -33,9 +33,9 @@ if [ -f "$ENV_FILE" ]; then
   # Read the env file, remove single and double quotes, then only
   # export lines which aren't comments or aren't empty.
   while read -r line; do
-    l=$(echo "$line" | sed -e "s/'//g" -e 's/"//g' )
-    if echo "$l" | grep '^[[:blank:]]*[^[:blank:]#]' > /dev/null; then
-      export $l
+    line=$(echo "$line" | sed -e "s/'//g" -e 's/"//g' )
+    if echo "$line" | grep '^[[:blank:]]*[^[:blank:]#]' > /dev/null; then
+      export $line
     fi
   done < "$ENV_FILE"
 fi
