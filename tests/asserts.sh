@@ -126,7 +126,7 @@ function assert_compose_service_up_not() {
 }
 
 function assert_http_status_code() {
-  curl_status=$(curl --silent --output /dev/null "$1" -w "%{http_code}")
+  curl_status=$(curl --insecure --silent --output /dev/null "$1" -w "%{http_code}")
   if [ "$curl_status" != "$2" ]; then
     echo 'ASSERT FAIL: Expected response status code to be the same as actual response code.'
     echo 'Expected code: '"$2"
@@ -137,7 +137,7 @@ function assert_http_status_code() {
 }
 
 function assert_http_status_code_not() {
-  curl_status=$(curl --silent --output /dev/null "$1" -w "%{http_code}")
+  curl_status=$(curl --insecure --silent --output /dev/null "$1" -w "%{http_code}")
   if [ "$curl_status" = "$2" ]; then
     echo 'ASSERT FAIL: Expected response status code to be different from actual response code.'
     echo 'Expected code: '"$2"
