@@ -16,10 +16,8 @@ if [ -z "$rand" ]; then
 fi
 test_service_name="test_""$rand"
 test_service_dir="../services/""$test_service_name"
-if [ -x "$test_service_dir" ]; then
-  echo "Error: test service already exists at ""$test_service_dir"; exit 1
-fi
-echo "mkdir ""$test_service_dir"
+assert not exists "$test_service_dir"
+echo 'mkdir '"$test_service_dir"
 mkdir -p "$test_service_dir"
 echo -e "OK\n"
 
@@ -52,12 +50,8 @@ echo "Testing default.env.sh..."
 cd ..
 . env.sh
 cd tests
-if [ -z "${DEFAULT_ENV_SH_TEST-}" ] ; then
-  echo "Error: DEFAULT_ENV_SH_TEST env variable is empty."; exit 1
-fi
-if [ "$DEFAULT_ENV_SH_TEST" != "$test_service_name" ]; then
-  echo "Error: DEFAULT_ENV_SH_TEST env variable is not expected value: expecting: ""$test_service_name""; got: ""$DEFAULT_ENV_SH_TEST"; exit 1
-fi
+assert not empty 'DEFAULT_ENV_SH_TEST' "${DEFAULT_ENV_SH_TEST-}"
+assert equal "$DEFAULT_ENV_SH_TEST" "$test_service_name"
 echo "DEFAULT_ENV_SH_TEST is ""$test_service_name"
 echo -e "OK\n"
 
@@ -66,9 +60,7 @@ echo "DEFAULT_ENV_SH_TEST=value_changed" >> ../.env
 cd ..
 . env.sh
 cd tests
-if [ "$DEFAULT_ENV_SH_TEST" != "value_changed" ]; then
-  echo "Error: DEFAULT_ENV_SH_TEST env variable is not expected value: expecting: value_changed; got: ""$DEFAULT_ENV_SH_TEST"; exit 1
-fi
+assert equal "$DEFAULT_ENV_SH_TEST" 'value_changed'
 echo "DEFAULT_ENV_SH_TEST is now: value_changed"
 echo -e "OK\n"
 
@@ -136,12 +128,8 @@ echo "Testing whether service gets enabled by checking for variable set in servi
 cd ..
 . env.sh
 cd tests
-if [ -z "${ENV_SH_TEST-}" ] ; then
-  echo "Error: ENV_SH_TEST env variable is empty."; exit 1
-fi
-if [ "$ENV_SH_TEST" != "$test_service_name" ]; then
-  echo "Error: ENV_SH_TEST env variable is not expected value: expecting: ""$test_service_name""; got: ""$ENV_SH_TEST"; exit 1
-fi
+assert not empty 'ENV_SH_TEST' "${ENV_SH_TEST-}"
+assert equal "$ENV_SH_TEST" "$test_service_name"
 echo -e "OK\n"
 
 unset ENV_SH_TEST
@@ -166,7 +154,7 @@ cd ..
 . env.sh
 cd tests
 if [ -n "${ENV_SH_TEST-}" ] ; then
-  echo "Error: ENV_SH_TEST env variable is set despite service being disabled."; exit 1
+  echo "FAIL: ENV_SH_TEST env variable is set despite service being disabled."; exit 1
 fi
 echo -e "OK\n"
 
@@ -181,12 +169,8 @@ echo "Testing that service was re-enabled..."
 cd ..
 . env.sh
 cd tests
-if [ -z "${ENV_SH_TEST-}" ] ; then
-  echo "Error: ENV_SH_TEST env variable is empty."; exit 1
-fi
-if [ "$ENV_SH_TEST" != "$test_service_name" ]; then
-  echo "Error: ENV_SH_TEST env variable is not expected value: expecting: ""$test_service_name""; got: ""$ENV_SH_TEST"; exit 1
-fi
+assert not empty 'ENV_SH_TEST' "${ENV_SH_TEST-}"
+assert equal "$ENV_SH_TEST" "$test_service_name"
 echo -e "OK\n"
 
 unset ENV_SH_TEST
@@ -209,7 +193,7 @@ cd ..
 . env.sh
 cd tests
 if [ -n "${ENV_SH_TEST-}" ] ; then
-  echo "Error: ENV_SH_TEST env variable is set despite service being disabled."; exit 1
+  echo "FAIL: ENV_SH_TEST env variable is set despite service being disabled."; exit 1
 fi
 echo -e "OK\n"
 
@@ -275,21 +259,13 @@ cd ..
 . env.sh
 cd tests
 compose_file_root_rel_path="services/""$test_service_name""/docker-compose.yml"
-if [ ! "$(echo $COMPOSE_FILE | grep $compose_file_root_rel_path)" ]; then
-  echo "Error: COMPOSE_FILE environment variable does not contain path to service's compose file: expecting to contain: ""$compose_file_root_rel_path""; contains: ""$COMPOSE_FILE"; exit 1
-fi
+assert contain "$compose_file_root_rel_path" "$COMPOSE_FILE"
 echo -e "OK\n"
 
 echo "Testing docker compose up..."
 cd ..
 docker compose up -d
-if [ ! "$(docker compose ps | grep test-dynamic-service-loading-nginx)" ]; then
-  echo "Error: when running 'docker compose ps' expected to find running container named 'test-dynamic-service-loading-nginx', could not find container:"
-  docker compose ps
-  docker compose down
-  cd tests
-  exit 1
-fi
+assert compose_container_up 'test-dynamic-service-loading-nginx'
 docker compose down
 cd tests
 echo -e "OK\n"
@@ -310,7 +286,7 @@ cd ..
 . env.sh
 cd tests
 if [ ! $(env | grep ^"$test_compose_file_updated_var_name""=1" ) ]; then
-  echo "Error: COMPOSE_FILE does not appear to have been updated before the test service's env.sh was sourced; grep did not find anything for ""$test_compose_file_updated_var_name""=1"; exit 1
+  echo "FAIL: COMPOSE_FILE does not appear to have been updated before the test service's env.sh was sourced; grep did not find anything for ""$test_compose_file_updated_var_name""=1"; exit 1
 fi
 echo "Testing: env | grep ^""$test_compose_file_updated_var_name""=1"
 env | grep ^"$test_compose_file_updated_var_name""=1"
