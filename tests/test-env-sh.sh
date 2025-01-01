@@ -1,3 +1,10 @@
+clean_exit() {
+  if [ -f .env ]; then
+    rm .env
+  fi
+}
+trap clean_exit EXIT
+
 echo "Getting current user and group IDs..."
 user_id="$(id -u)"
 echo "User ID: ""$user_id"
@@ -32,16 +39,46 @@ if [ "$group_id" != "$PGID" ]; then
 fi
 echo -e "OK\n"
 
-echo "Testing a .env file being sourced..."
-echo "TESTING=testing" > .env
+echo "Writing .env file for testing variables get sourced properly..."
+cat <<EOL > .env
+TESTING=testing
+
+# comments
+
+  LEADING_SPACE_TESTING=test
+QUOTE_TESTING='test'"ing"
+
+# this is a comment
+  # comment
+
+SPACE_TESTING=test1 test2 "test3" 'test4'
+EOL
+echo "cat .env:"
+cat .env
 . ../env.sh
 rm .env
-echo "TESTING: ""$TESTING"
-if [ -z "$TESTING" ]; then
-  echo "Error: \$TESTING is empty"; exit 1
+echo -e "OK\n"
+
+echo "Testing env variables..."
+if [ "${TESTING-}" = 'testing' ]; then
+  echo 'TESTING='"$TESTING"
+else
+  echo 'Error: expected TESTING to be: testing; actual value: '"${TESTING-}"
 fi
-if [ "$TESTING" != "testing" ]; then
-  echo "Error: \$TESTING is not set to expected string: \$TESTING is $TESTING; expected string \"testing\""; exit 1
+if [ "${LEADING_SPACE_TESTING-}" = 'test' ]; then
+  echo 'LEADING_SPACE_TESTING='"$LEADING_SPACE_TESTING"
+else
+  echo 'Error: expected LEADING_SPACE_TESTING to be: test; actual value: '"${LEADING_SPACE_TESTING-}"
+fi
+if [ "${QUOTE_TESTING-}" = 'testing' ]; then
+  echo 'QUOTE_TESTING='"$QUOTE_TESTING"
+else
+  echo 'Error: expected QUOTE_TESTING to be: testing; actual value: '"${QUOTE_TESTING-}"
+fi
+if [ "${SPACE_TESTING-}" = 'test1' ]; then
+  echo 'SPACE_TESTING='"$SPACE_TESTING"
+else
+  echo 'Error: expected SPACE_TESTING to be: test1; actual value: '"${SPACE_TESTING-}"
 fi
 echo -e "OK\n"
 
