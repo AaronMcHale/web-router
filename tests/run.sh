@@ -11,7 +11,7 @@ trap clean_exit EXIT
 
 run_test() {
   echo -e "Running "$1"...\n"
-  bash -c "set -euo pipefail; . ""$1"
+  bash -c "set -euo pipefail; . asserts.sh; . ""$1"
   echo -e "Done\n\n"
 }
 
