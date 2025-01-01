@@ -32,6 +32,8 @@ function assert() {
     'not: contain') assert_contain_not "$1" "${2-}" ;;
     'compose_container_up') assert_compose_service_up "$1" ;;
     'not: compose_container_up') assert_compose_service_up_not "$1" ;;
+    'http_status_code') assert_http_status_code "$1" "$2" ;;
+    'not: http_status_code') assert_http_status_code_not "$1" "$2" ;;
     *) echo 'assert: '"$assert"': test does not exist.'; exit 1 ;;
   esac
 }
@@ -119,6 +121,28 @@ function assert_compose_service_up_not() {
   if [ "$(docker compose ps | grep -w $1 )" ]; then
     echo 'ASSERT FAIL: docker compose container appear to be running, found running container matching name when running `docker compose ps`.'
     echo 'Container name: '"$1"
+    exit 1
+  fi
+}
+
+function assert_http_status_code() {
+  curl_status=$(curl --silent --output /dev/null "$1" -w "%{http_code}")
+  if [ "$curl_status" != "$2" ]; then
+    echo 'ASSERT FAIL: Expected response status code to be the same as actual response code.'
+    echo 'Expected code: '"$2"
+    echo 'Response code: '"$curl_status"
+    echo 'URL: '"$1"
+    exit 1
+  fi
+}
+
+function assert_http_status_code_not() {
+  curl_status=$(curl --silent --output /dev/null "$1" -w "%{http_code}")
+  if [ "$curl_status" = "$2" ]; then
+    echo 'ASSERT FAIL: Expected response status code to be different from actual response code.'
+    echo 'Expected code: '"$2"
+    echo 'Response code: '"$curl_status"
+    echo 'URL: '"$1"
     exit 1
   fi
 }
