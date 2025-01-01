@@ -30,8 +30,14 @@ if [ -z "${ENV_FILE-}" ]; then
   export ENV_FILE='.env'
 fi
 if [ -f "$ENV_FILE" ]; then
-  # Source the env file but ignore comments and blank lines
-  export $(grep '^[[:blank:]]*[^[:blank:]#]' "$ENV_FILE" | xargs)
+  # Read the env file, remove single and double quotes, then only
+  # export lines which aren't comments or aren't empty.
+  while read -r line; do
+    l=$(echo "$line" | sed -e "s/'//g" -e 's/"//g' )
+    if echo "$l" | grep '^[[:blank:]]*[^[:blank:]#]' > /dev/null; then
+      export $l
+    fi
+  done < "$ENV_FILE"
 fi
 
 # Load services
