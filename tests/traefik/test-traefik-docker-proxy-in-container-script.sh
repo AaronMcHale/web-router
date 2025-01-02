@@ -12,44 +12,32 @@
 
 set -euo pipefail
 
+. /asserts.sh
+
 function run_docker_get_output() {
   # We need to temporarily set the environment so that non-zero exist statuses
   # don't cause the script to exit.
+  local command="$1"
+  local args="$@"
   set +e
-  output="$(docker $@ 2>&1)"
+  output=$(docker $@ 2>&1)
   set -e
 }
 
 echo "Test connection and access is allowed to version command..."
-run_docker_get_output version
-if [ ! "$(echo $output | grep Version )" ]; then
-  echo "Error: did not return expected output from 'version', expected output containing: Version; actual output was:"
-  echo "$output"
-  exit 1
-fi
+set +e; output="$(docker version --format='{{json .Server.Components}}' 2>&1)"; set -e
+assert contain 'Version' "$output"
 echo -e "OK\n"
 
 echo "Test access is allowed to inspect \"pong\" container from \"ping\" container..."
-run_docker_get_output container inspect test-traefik-docker-proxy-pong
-if [ ! "$(echo $output | grep running )" ]; then
-  echo "Error: did not receive expected output from 'container inspect', expected output containing: running; actual output was:"
-  echo "$output"
-  exit 1
-fi
+set +e; output="$(docker container inspect test-traefik-docker-proxy-pong --format='{{json .State }}' 2>&1)"; set -e
+assert contain 'running' "$output"
 echo -e "OK\n"
 
 echo "Test access is blocked to exec on \"pong\" container from \"ping\" container..."
 # We want to test both `exec` and `container exec` just for peace of mind
-run_docker_get_output exec test-traefik-docker-proxy-pong ls
-if [ ! "$(echo $output | grep '403 Forbidden' )" ]; then
-  echo "Error: did not receive expected output from 'exec', expected output containing: 403 Forbidden; actual output was:"
-  echo "$output"
-  exit 1
-fi
-run_docker_get_output container exec test-traefik-docker-proxy-pong ls
-if [ ! "$(echo $output | grep '403 Forbidden' )" ]; then
-  echo "Error: did not receive expected output from 'container exec', expected output containing: 403 Forbidden; actual output was:"
-  echo "$output"
-  exit 1
-fi
+set +e; output="$(docker exec test-traefik-docker-proxy-pong ls 2>&1)"; set -e
+assert contain 'Forbidden' "$output"
+set +e; output="$(docker container exec test-traefik-docker-proxy-pong ls 2>&1)"; set -e
+assert contain 'Forbidden' "$output"
 echo -e "OK\n"
