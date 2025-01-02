@@ -30,7 +30,14 @@ This will setup the required environment variables.
 
 ## Services
 
-Services are grouped into service folders, along with all of their resources. Services can be enabled and disabled using environment variables. All services exist under the `services` directory.
+The following services are enabled by default:
+* [Traefik](services/traefik/README.md)
+
+Services can be enabled or disabled using environment variables, refer to the Environment variables section for what to add to your `.env` file.
+
+## Learn more about services
+
+Services are grouped into service folders, along with all of their resources. All services exist under the `services` directory.
 
 [Learn more about how services work in the services README.md](services/README.md)
 
@@ -39,6 +46,18 @@ Services are grouped into service folders, along with all of their resources. Se
 Environment variables can be set in a `.env` file, the `env.sh` script will load the env file and export variables.
 
 The env file may include blank lines and comments, comments must be prefixed with a `#`.
+
+The following environment variables can be used to configure different parts of web-router.
+
+Default values are provided for all of these variables, so it is not required to include all of these in the `.env` file, only the variables that need to be changed.
+
+| Variable name | Default value | Description |
+| ------------- | ------------- | ----------- |
+| `SERVICE_ENABLED_TRAEFIK` | `1` | Enables the [Traefik service](services/traefik/README.md), set to `0` to disable Traefik. |
+| `DEFAULT_DOMAIN` | `localhost` | The domain name that services will use for administrative routes, for example the Traefik Dashboard. |
+| `DOCKER_SOCKET_PATH` | `/var/run/docker.sock` | The path to the docker socket on the host, this is mounted inside the `traefik-docker-proxy` container. To increase security, Traefik never has full direct access to the socket, the proxy container grants read access to only what Traefik needs. |
+| `TRAEFIK_API_DASHBOARD` | `1` | Whether the Traefik API and Dashboard are enabled, set to `0` to disable. |
+| `TRAEFIK_LOG_LEVEL` | `ERROR` | [Log level values can be found in the Traefik documentation](https://doc.traefik.io/traefik/observability/logs/#level) |
 
 <details>
 <summary>Specifying an alternative env file</summary>

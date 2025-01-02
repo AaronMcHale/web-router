@@ -1,0 +1,13 @@
+services:
+  traefik:
+    environment:
+      TRAEFIK_API_DASHBOARD: true
+      # Hides the Traefik dashboard ad
+      TRAEFIK_API_DISABLEDASHBOARDAD: true
+      # We don't need insecure mode since we define the API and Dashboard
+      # routes ourselves.
+      TRAEFIK_API_INSECURE: false
+    labels:
+      traefik.enable: true
+      traefik.http.routers.traefik.rule: "Host(`${DEFAULT_DOMAIN?}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      traefik.http.routers.traefik.service: "api@internal"
