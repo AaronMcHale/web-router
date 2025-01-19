@@ -8,6 +8,7 @@ echo "Test setup..."
 cd ..
 . env.sh
 docker compose up -d
+sleep 2 # give a little time for routes to be registered
 echo -e "OK\n"
 
 echo "Test Traefik is set to start by default..."
@@ -32,11 +33,20 @@ set +e; output="$(docker compose exec traefik echo 'test'>/tmp/test && cat /tmp/
 assert_msg='attempt to write to /tmp failed or the file was written but its contents could not be read, expected `cat /tmp/test` to output: test'
 assert contain 'test' "$output"
 echo -e "OK\n"
+unset assert_msg
+
+echo "Test Traefik redirects HTTP to HTTPS by default..."
+echo "  Testing status code..."
+assert http_status_code 'http://localhost/' '301'
+echo "  Testing response headers..."
+assert http_response_headers_contain "http://localhost/" "https://localhost/"
+echo -e "OK\n"
+exit
 
 echo "Test Traefik can discover Docker containers..."
 export COMPOSE_FILE="$COMPOSE_FILE"":tests/traefik/docker-compose.test-traefik-docker-discovery.yml"
 docker compose up -d
 sleep 2 # give a little time for the route to be registered
-url="http://""$DEFAULT_DOMAIN""/api/http/routers/test-traefik-docker-discovery@docker"
+url="https://""$DEFAULT_DOMAIN""/api/http/routers/test-traefik-docker-discovery@docker"
 assert http_status_code $url '200'
 echo -e "OK\n"

@@ -36,6 +36,8 @@ function assert() {
     'not: compose_container_up') assert_compose_service_up_not "$1" ;;
     'http_status_code') assert_http_status_code "$1" "$2" ;;
     'not: http_status_code') assert_http_status_code_not "$1" "$2" ;;
+    'http_response_headers_contain') assert_http_response_headers_contain "$1" "$2" ;;
+    'not: http_response_headers_contain') assert_http_response_headers_contain_not "$1" "$2" ;;
     *) echo 'assert: '"$assert"': test does not exist.'; exit 1 ;;
   esac
 }
@@ -172,4 +174,34 @@ function assert_http_status_code_not() {
     echo 'URL: '"$1"
     exit 1
   fi
+}
+
+function assert_http_response_headers_contain() {
+  tmp_file='/tmp/web-router-test-curl-'"$RANDOM"
+  curl --insecure --no-progress-meter --head "$1" > "$tmp_file"
+  if [ $(grep --count --fixed-strings "$2" "$tmp_file") -eq 0 ]; then
+    print_assert_msg 'Expected response header to contain string, response headers do not contain expected string.'
+    echo 'Expected string: '"$2"
+    echo 'URL: '"$1"
+    echo 'Response headers:'
+    cat "$tmp_file"
+    rm -f "$tmp_file"
+    exit 1
+  fi
+  rm -f "$tmp_file"
+}
+
+function assert_http_response_headers_contain_not() {
+  tmp_file='/tmp/web-router-test-curl-'"$RANDOM"
+  curl --insecure --no-progress-meter --head "$1" > "$tmp_file"
+  if [ $(grep --count --fixed-strings "$2" "$tmp_file") -gt 0 ]; then
+    print_assert_msg 'Expected response header not to contain string, found string in response headers.'
+    echo 'String: '"$2"
+    echo 'URL: '"$1"
+    echo 'Response headers:'
+    cat "$tmp_file"
+    rm -f "$tmp_file"
+    exit 1
+  fi
+  rm -f "$tmp_file"
 }

@@ -13,7 +13,7 @@ echo 'Setup tests for TRAEFIK_API_DASHBOARD=0...'
 echo 'TRAEFIK_API_DASHBOARD=0' > test-traefik-api-dashboard.env
 export ENV_FILE='test-traefik-api-dashboard.env'
 . env.sh
-traefik_url='http://'"$DEFAULT_DOMAIN"
+traefik_url='https://'"$DEFAULT_DOMAIN"
 docker compose up -d
 sleep 2 # give a little time for the route to be registered
 echo -e "OK\n"
@@ -32,7 +32,7 @@ echo 'Setup tests for TRAEFIK_API_DASHBOARD=1...'
 echo 'TRAEFIK_API_DASHBOARD=1' > test-traefik-api-dashboard.env
 export ENV_FILE='test-traefik-api-dashboard.env'
 . env.sh
-traefik_url='http://'"$DEFAULT_DOMAIN"
+traefik_url='https://'"$DEFAULT_DOMAIN"
 docker compose up -d
 sleep 2 # give a little time for the route to be registered
 echo -e "OK\n"
