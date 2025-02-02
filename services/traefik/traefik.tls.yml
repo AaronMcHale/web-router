@@ -1,0 +1,6 @@
+# Traefik dynamic configuration for TLS
+# https://doc.traefik.io/traefik/https/tls
+tls:
+  options:
+    default:
+      minVersion: VersionTLS13

@@ -33,6 +33,9 @@ services:
       TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT: false
       TRAEFIK_PROVIDERS_DOCKER_NETWORK: 'web-router'
       TRAEFIK_PROVIDERS_DOCKER_HTTPCLIENTTIMEOUT: 300
+      # Traefik providers: file
+      TRAEFIK_PROVIDERS_FILE_DIRECTORY: '/dynamic-config'
+      TRAEFIK_PROVIDERS_FILE_WATCH: 'true'
     networks:
       - web-router
       - traefik_internal
@@ -44,6 +47,10 @@ services:
     security_opt: [ no-new-privileges=true ]
     user: "${PUID?}:${PGID?}"
     tmpfs: [ /tmp ]
+    volumes:
+      # Traefik dynamic config
+      # Each config file should be mounted in /dynamic-config
+      - ./services/traefik/traefik.tls.yml:/dynamic-config/traefik.tls.yml:ro
 
   traefik-docker-proxy:
     image: lscr.io/linuxserver/socket-proxy:1.26.2-r3-ls33

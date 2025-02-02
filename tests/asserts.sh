@@ -38,6 +38,8 @@ function assert() {
     'not: http_status_code') assert_http_status_code_not "$1" "$2" ;;
     'http_response_headers_contain') assert_http_response_headers_contain "$1" "$2" ;;
     'not: http_response_headers_contain') assert_http_response_headers_contain_not "$1" "$2" ;;
+    'http_tls_version') assert_http_tls_version "$1" "$2" ;;
+    'not: http_tls_version') assert_http_tls_version_not "$1" "$2" ;;
     *) echo 'assert: '"$assert"': test does not exist.'; exit 1 ;;
   esac
 }
@@ -204,4 +206,29 @@ function assert_http_response_headers_contain_not() {
     exit 1
   fi
   rm -f "$tmp_file"
+}
+
+function assert_http_tls_version() {
+  set +e
+  curl --insecure --silent --tlsv$1 --tls-max "$1" --output /dev/null "$2"
+  if [ "$?" -eq '35' ]; then
+    print_assert_msg 'Tried to use TLS version '"$1"' but this version does not appear to be supported.'
+    echo 'URL: '"$2"
+    echo 'curl: (35) error:0A0000BF:SSL routines::no protocols available'
+    set -e; exit 1
+  fi
+  set -e
+}
+
+function assert_http_tls_version_not() {
+  set +e
+  curl --insecure --silent --tlsv$1 --tls-max "$1" --output /dev/null "$2"
+  status="$?"
+  if [ "$status" -ne 35 ]; then
+    print_assert_msg 'Expected TLS version '"$1"' not to be supported, but TLS version appears to be supported, or a different error ocurred.'
+    echo 'URL: '"$2"
+    echo 'Status code '"$status"' received from cURL'
+    set -e; exit 1
+  fi
+  set -e
 }
