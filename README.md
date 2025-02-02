@@ -72,13 +72,13 @@ Services are grouped into service folders, along with all of their resources. Al
 
 [Learn more about how services work in the services README.md](services/README.md)
 
-## Environment variables
+## Configuring web-router using environment variables
 
-Environment variables can be set in a `.env` file, the `env.sh` script will load the env file and export variables.
+Environment variables can be used to configure web-router and its services.
+
+Creating a `.env` file is the easiest way to set values for these environment variables, the `env.sh` script will load the env file and export variables.
 
 The env file may include blank lines and comments, comments must be prefixed with a `#`.
-
-The following environment variables can be used to configure different parts of web-router.
 
 Default values are provided for all of these variables, so it is not required to include all of these in the `.env` file, only the variables that need to be changed.
 
