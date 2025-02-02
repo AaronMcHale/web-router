@@ -26,3 +26,4 @@ run_test test-dynamic-service-loading.sh
 run_test traefik/test-traefik-docker-proxy.sh
 run_test traefik/test-traefik.sh
 run_test traefik/test-traefik-api-dashboard.sh
+run_test traefik/test-traefik-tls-1-3.sh
