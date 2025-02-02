@@ -39,5 +39,5 @@ When running `docker compose up`, assuming our `extra_endpoint` service is enabl
 
 The same approach can be taken for volumes and labels.
 
-Note that because we are using the key/value YAML syntax, rathe than the normal list syntax (where items start with a `-`), Docker will handle duplicates automatically. This allows us to, for example, override the value of an environment variables set in another compose file. Although note that web-rotuer does not make any guarentees about the load over of services. So unless you are loading Compose files using your service's `env.sh` script, you should not assume that another service will be loaded first.
+Note that because we are using the key/value YAML syntax, rathe than the normal list syntax (where items start with a `-`), Docker will handle duplicates automatically. This allows us to, for example, override the value of an environment variables set in another compose file. Although note that web-router does not make any guarentees about the load over of services. So unless you are loading Compose files using your service's `env.sh` script, you should not assume that another service will be loaded first.
 </details>
