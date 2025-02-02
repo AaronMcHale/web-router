@@ -1,0 +1,61 @@
+networks:
+  traefik_internal:
+    driver: bridge
+
+services:
+
+  traefik:
+    image: traefik:v3.2.3
+    depends_on:
+      - traefik-docker-proxy
+    # We use environment variables to define Traefik's static configuration
+    # this allows additional configuration to be added in other compose files.
+    # https://doc.traefik.io/traefik/reference/static-configuration/env/
+    environment:
+      # API and Dashboard is enabled and configured in the `traefik-api-dashboard`
+      # Compose file, which is only enabled if the `TRAEFIK_API_DASHBOARD` env
+      # variable, so we ensure API and Dashboard are disabled by default.
+      TRAEFIK_API_DASHBOARD: false
+      # HTTP and HTTPS entrypoints
+      # We use `asDefault` to setup HTTPS by default on all routes, and redirect
+      # all HTTP to HTTPS. This means routes do not need to specify entrypoints,
+      # it just works.
+      TRAEFIK_ENTRYPOINTS_WEB_ADDRESS: ':80'
+      TRAEFIK_ENTRYPOINTS_WEB_HTTP_REDIRECTIONS_ENTRYPOINT_TO: 'websecure'
+      TRAEFIK_ENTRYPOINTS_WEBSECURE_ADDRESS: ':443'
+      TRAEFIK_ENTRYPOINTS_WEBSECURE_ASDEFAULT: 'true'
+      TRAEFIK_ENTRYPOINTS_WEBSECURE_HTTP_TLS: 'true'
+      # Traefik log level settings, defaults to ERROR if the TRAEFIK_LOG_LEVEL
+      # env variable is not set.
+      TRAEFIK_LOG_LEVEL: "${TRAEFIK_LOG_LEVEL:-ERROR}"
+      # Traefik providers: docker
+      TRAEFIK_PROVIDERS_DOCKER_ENDPOINT: 'tcp://traefik-docker-proxy:2375'
+      TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT: false
+      TRAEFIK_PROVIDERS_DOCKER_NETWORK: 'web-router'
+      TRAEFIK_PROVIDERS_DOCKER_HTTPCLIENTTIMEOUT: 300
+    networks:
+      - web-router
+      - traefik_internal
+    ports:
+      - "80:80"
+      - "443:443"
+    restart: unless-stopped
+    read_only: true
+    security_opt: [ no-new-privileges=true ]
+    user: "${PUID?}:${PGID?}"
+    tmpfs: [ /tmp ]
+
+  traefik-docker-proxy:
+    image: lscr.io/linuxserver/socket-proxy:1.26.2-r3-ls33
+    environment:
+      # Grant access to these specific operations only, all others will not be allowed
+      - CONTAINERS=1
+      - EVENTS=1
+      - PING=1
+      - VERSION=1
+    networks: [ traefik_internal ]
+    read_only: true
+    restart: unless-stopped
+    security_opt: [ no-new-privileges=true ]
+    tmpfs: [ /run ]
+    volumes: [ "${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro" ]

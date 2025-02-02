@@ -15,6 +15,7 @@ export PGID="$(id -g)"
 # Set defaults for services
 # -------------------------
 export COMPOSE_FILE="docker-compose.yml"
+export DEFAULT_DOMAIN='localhost'
 for service in ./services/*; do
   # Check `$service` is actually a directory, avoids trying to load
   # regular files, and if the `services` directory doesn't exist

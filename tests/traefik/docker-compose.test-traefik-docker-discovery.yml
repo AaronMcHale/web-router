@@ -1,0 +1,7 @@
+services:
+  test-traefik-docker-discovery:
+    image: nginx:alpine
+    networks: [ web-router ]
+    labels:
+      traefik.enable: true
+      traefik.http.routers.test-traefik-docker-discovery.rule: "Host(`${DEFAULT_DOMAIN?}`) && PathPrefix(`/test-traefik-docker-discovery`)"

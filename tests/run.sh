@@ -23,3 +23,6 @@ fi
 run_test test-env-sh.sh
 run_test test-networks.sh
 run_test test-dynamic-service-loading.sh
+run_test traefik/test-traefik-docker-proxy.sh
+run_test traefik/test-traefik.sh
+run_test traefik/test-traefik-api-dashboard.sh
