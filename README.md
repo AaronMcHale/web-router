@@ -58,7 +58,7 @@ services:
 
 This would make the nginx container available on example.com, specifically:
 1. Going to http://example.com would automatically redirect to https://example.com.
-2. https://example.com would be serviced by this nginx container.
+2. https://example.com would be served by this nginx container.
 3. TLS/SSL is setup automatically.
 4. We do not need to expose any additional ports, since by default nginx exposes port 80, if a Docker container only exposes a single port, Traefik will use that port without any additional configuration.
 5. We do not need to provide any entrypoints, Traefik is configured to automatically enable http and https on all routes.
