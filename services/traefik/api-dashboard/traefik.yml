@@ -1,0 +1,11 @@
+# Traefik dynamic configuration for the API and Dashboard route.
+#
+# Mounted in the Traefik container in the relative `docker-compose.yml` file.
+#
+# We use file dynamic config instead of docker labels so that if the docker provider
+# is not available the API and Dashboard continues to be available.
+http:
+  routers:
+    traefik:
+      rule: Host(`{{env "API_DASHBOARD_DOMAIN"}}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      service: "api@internal"

@@ -1,0 +1,17 @@
+# Docker compose file for Traefik API and Dashboard.
+#
+# Only enabled if the `TRAEFIK_API_DASHBOARD` env variable is set to 1.
+# See `env.sh` in the parent directory.
+services:
+  traefik:
+    environment:
+      # Used in the `traefik.yml` to set the domain used for API and Dashboard route.
+      API_DASHBOARD_DOMAIN: "${DEFAULT_DOMAIN?}"
+      TRAEFIK_API_DASHBOARD: true
+      # Hides the Traefik dashboard ad
+      TRAEFIK_API_DISABLEDASHBOARDAD: true
+      # We don't need insecure mode since we define the API and Dashboard
+      # routes ourselves.
+      TRAEFIK_API_INSECURE: false
+    volumes:
+      - ./services/traefik/api-dashboard/traefik.yml:/dynamic-config/traefik-api-dashboard.yml:ro
