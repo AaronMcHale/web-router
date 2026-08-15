@@ -12,9 +12,10 @@ services:
     # this allows additional configuration to be added in other compose files.
     # https://doc.traefik.io/traefik/reference/static-configuration/env/
     environment:
-      # API and Dashboard is enabled and configured in the `traefik-api-dashboard`
-      # Compose file, which is only enabled if the `TRAEFIK_API_DASHBOARD` env
-      # variable, so we ensure API and Dashboard are disabled by default.
+      # API and Dashboard is enabled and configured in the Compose file and
+      # YML in the `api-dashboard` directory. This is only enabled if the
+      # `TRAEFIK_API_DASHBOARD` env variable, so we ensure API and Dashboard
+      # are disabled by default.
       TRAEFIK_API_DASHBOARD: false
       # HTTP and HTTPS entrypoints
       # We use `asDefault` to setup HTTPS by default on all routes, and redirect
