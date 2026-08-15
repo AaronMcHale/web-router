@@ -14,4 +14,4 @@ services:
       # routes ourselves.
       TRAEFIK_API_INSECURE: false
     volumes:
-      - ./services/traefik/api-dashboard/traefik.yml:/dynamic-config/traefik-api-dashboard.yml:ro
+      - ./services/traefik/api-dashboard/api-dashboard.traefik.yml:/dynamic-config/:ro

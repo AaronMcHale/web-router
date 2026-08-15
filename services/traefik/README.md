@@ -7,7 +7,7 @@ Traefik provides the routing for HTTP and HTTPS trafic to downstream services on
 ## Compose files
 
 - `docker-compose.yml` defines the Traefik Docker service and the Docker Socket Proxy service, along with minimal configuration.
-- `docker-compose.traefik-api-dashboard.yml` adds config and labels for exposing the Traefik API and Dashboard. This compose file is included in the `env.sh` script for this service, and is only loaded if the `TRAEFIK_API_DASHBOARD` environment variable is set to `1`.
+- `api-dashboard/api-dashboard.docker-compose.yml` adds config for exposing the Traefik API and Dashboard. This compose file is only loaded when the `TRAEFIK_API_DASHBOARD` environment variable is set to `1` and is loaded by the `env.sh` script for this service.
 
 ## Traefik configuration
 
@@ -22,10 +22,11 @@ The file provider is also setup to provide dynamic configuration, the file provi
 ### Traefik static configuration
 
 Traefik provides several ways to specify the [static configuration](https://doc.traefik.io/traefik/getting-started/configuration-overview/#the-static-configuration), we have chosen to use the environment variables approach. This has two key advantages:
-1. Using environment variables, rather than a YAML file allows us to use other variables in building the configuration.
-2. Using environment variables allows other compose files (and other services) to extend and override the static configuration.
 
-For example, in `docker-compose.traefik-api-dashboard.yml` we extend the `traefik` service and add additional configuration to enable the API and Dashboard. When Docker merges the compose files together, all of the configuration will be passed into the Traefik container for use at runtime.
+1. Using environment variables, rather than a YAML file allows us to use other variables in building the configuration;
+2. And allows other compose files (and other services) to extend and override the static configuration.
+
+For example, in `api-dashboard/api-dashboard.docker-compose.yml` we extend the `traefik` service and add additional configuration to enable the API and Dashboard. When Docker merges the compose files together, all of the configuration will be passed into the Traefik container for use at runtime.
 
 ### Other services providing static and dynamic configuration
 
@@ -34,9 +35,10 @@ Other services may extend and override Traefik configuration. This is done by ad
 <details>
 <summary>Further examples for extending or overriding Traefik configuration</summary>
 
-Let's say you create a service named `extra_endpoint` in the `/services` directory, and when that service is enabled it should add an extra endpoint to Traefik which is enabled by default on all routes. The also provides additional dynamic configuration in a YAML file, let's say that's stored in the `traefik.extra-config.yml` file.
+Let's say you create a service named `extra_endpoint` in the `/services` directory, and when that service is enabled it should add an extra endpoint to Traefik which is enabled by default on all routes. The also provides additional dynamic configuration in a YAML file, let's say that's stored in the `extra-config.traefik.yml` file.
 
 The `docker-compose.yml` would look something like this:
+
 ```YAML
 services:
   traefik:
@@ -44,10 +46,11 @@ services:
       TRAEFIK_ENTRYPOINTS_EXTRAENDPOINT_ADDRESS: ':8080'
       TRAEFIK_ENTRYPOINTS_EXTRAENDPOINT_ASDEFAULT: 'true'
     volumes:
-      - ./services/extra_endpoint/traefik.extra-config.yml:/dynamic-config/extra-config.yml:ro
+      - ./services/extra_endpoint/extra-config.traefik.yml:/dynamic-config/:ro
 ```
 
 When running `docker compose up`, assuming our `extra_endpoint` service is enabled, its `docker-compose.yml` file will be merged with the other Compose files in web-router, and the following would happen:
+
 1. Docker recognises that the `traefik` service is defined in another Compose file, so merges the services together into a single Traefik service.
 2. It notices that we're providing some environment variables, and because the environment variables are a key/value list, Docker will merge together all `environment` lists into a single list on the Traefik container.
 3. It notices that we're providing an additional volume, so Docker will mount this in the container. Note that we're mounting the config as read-only, by setting `:ro`.
