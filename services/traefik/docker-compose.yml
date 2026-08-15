@@ -5,7 +5,7 @@ networks:
 services:
 
   traefik:
-    image: traefik:v3.2.3
+    image: traefik:v3.7.10
     depends_on:
       - traefik-docker-proxy
     # We use environment variables to define Traefik's static configuration
