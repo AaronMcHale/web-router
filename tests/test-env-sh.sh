@@ -5,6 +5,15 @@ clean_exit() {
 }
 trap clean_exit EXIT
 
+echo "Testing default.env is copied to .env ..."
+echo "test" > default.env
+. ../env.sh
+if [[ "$(cat .env)" != "test" ]]; then
+  echo "Error: expected .env to equal 'test', .env contains: $(cat .env)"; exit 1
+fi
+rm default.env
+rm .env
+
 echo "Getting current user and group IDs..."
 user_id="$(id -u)"
 echo "User ID: ""$user_id"

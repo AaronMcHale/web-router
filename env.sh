@@ -15,20 +15,16 @@ export PGID="$(id -g)"
 # Set defaults for services
 # -------------------------
 export COMPOSE_FILE="docker-compose.yml"
-export DEFAULT_DOMAIN='localhost'
-for service in ./services/*; do
-  # Check `$service` is actually a directory, avoids trying to load
-  # regular files, and if the `services` directory doesn't exist
-  # `$service` could be "./services/*".
-  if [ -d "$service" ] && [ -f "$service""/defaults.env.sh" ]; then
-    . "$service""/defaults.env.sh"
-  fi
-done
+export DEFAULT_DOMAIN="localhost"
 
 # Load .env
 # ---------
 if [ -z "${ENV_FILE-}" ]; then
   export ENV_FILE='.env'
+fi
+if [[ ! -f "$ENV_FILE" ]] && [[ -f 'default.env' ]]; then
+  echo "No $ENV_FILE file found, creating $ENV_FILE from default.env."
+  cp default.env "$ENV_FILE"
 fi
 if [ -f "$ENV_FILE" ]; then
   # Read the env file, remove single and double quotes, then only
