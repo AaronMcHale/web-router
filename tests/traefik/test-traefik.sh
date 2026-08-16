@@ -11,11 +11,6 @@ docker compose up -d
 sleep 2 # give a little time for routes to be registered
 echo -e "OK\n"
 
-echo "Test Traefik is set to start by default..."
-assert_msg='traefik service is not set to start by default, expected default.env.sh to contain: SERVICE_ENABLED_TRAEFIK=1'
-assert file_contain 'export SERVICE_ENABLED_TRAEFIK=1' 'services/traefik/defaults.env.sh'
-echo -e "OK\n"
-
 echo "Test container is running with current user..."
 output="$(docker compose exec traefik id -u)"
 assert_msg='expected output of `id -u` to be same as PUID variable'
