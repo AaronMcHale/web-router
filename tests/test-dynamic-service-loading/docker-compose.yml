@@ -1,0 +1,5 @@
+# Docker Compose file used during the test-dynamic-service-loading test.
+services:
+  test-dynamic-service-loading-nginx:
+    image: nginx:alpine
+    networks: [ web-router ]

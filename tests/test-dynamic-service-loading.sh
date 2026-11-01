@@ -8,8 +8,8 @@ echo -e "OK\n"
 # Ensure that any reunning containers are stopped and removed on exit.
 clean_exit() {
   rm -f "$ENV_FILE"
-  if [ -n "${test_service_dir:-}" ] && [ -x "$test_service_dir" ]; then
-    rm -rf "$test_service_dir"
+  if [ -d 'services/test-dynamic-service-loading' ]; then
+    rm -rf 'services/test-dynamic-service-loading'
   fi
 }
 trap clean_exit EXIT
@@ -19,119 +19,45 @@ cd ..
 # Setup test service
 # ------------------
 
-echo "Creating service for running tests with random name..."
-rand="$RANDOM"
-[[ -z "$rand" ]] && echo 'Error: Unable to generate random number: $RANDOM is empty.' && exit 1
-test_service_name='test_'"$rand"
-test_service_dir='services/'"$test_service_name"
-[[ -e "$test_service_dir" ]] && { echo "FAIL: $test_service_dir already exists ."; exit 1; }
-echo 'mkdir '"$test_service_dir"
-mkdir -p "$test_service_dir"
+echo "Copying test service into services..."
+[[ -e 'services/test-dynamic-service-loading' ]] && { echo 'FAIL: services/test-dynamic-service-loading already exists.'; exit 1; }
+cp -R 'tests/test-dynamic-service-loading' 'services/test-dynamic-service-loading'
+[[ ! -d 'services/test-dynamic-service-loading' ]] && { echo 'FAIL: services/test-dynamic-service-loading was not created.'; exit 1; }
 echo -e "OK\n"
 
-# Setting up env.sh for tests
-# ---------------------------
-
-echo "Creating env.sh for test service..."
-env_sh_path="$test_service_dir""/env.sh"
-echo "export ENV_SH_TEST=""$test_service_name" > "$env_sh_path"
-[[ ! -e "$env_sh_path" ]] && { echo "FAIL: $env_sh_path does not exist."; exit 1; }
-echo "Wrote to ""$env_sh_path:"
-echo "$(<"$env_sh_path")"
-echo -e "OK\n"
-
-# SERVICE_ENABLED variable
-# ------------------------
-
-test_service_enable_var_name="SERVICE_ENABLED_${test_service_name^^}"
+unset SERVICE_ENABLED_TEST_DYNAMIC_SERVICE_LOADING ENV_SH_TEST TEST_DYNAMIC_SERVICE_LOADING_COMPOSE_FILE_UPDATED
 
 # Testing enabling service
 # ------------------------
 
+echo "Testing that test service is not enabled by default..."
+source env.sh
+[[ -n "${ENV_SH_TEST-}" ]] && { echo 'FAIL: ENV_SH_TEST is set while the service is disabled.'; exit 1; }
+[[ "$COMPOSE_FILE" == *'test-dynamic-service-loading'* ]] && { echo 'FAIL: COMPOSE_FILE contains the disabled test service.'; exit 1; }
+echo -e "OK\n"
+
 echo "Writing to .env to enable test service ..."
-echo "$test_service_enable_var_name""=1" > "$ENV_FILE"
+echo 'SERVICE_ENABLED_TEST_DYNAMIC_SERVICE_LOADING=1' > "$ENV_FILE"
 echo 'Env file '"$ENV_FILE"
 cat "$ENV_FILE"
 echo -e "OK\n"
 
-echo "Testing whether service gets enabled by checking for variable set in service's env.sh after sourcing root env.sh..."
+echo "Testing whether service is now enabled ..."
 source env.sh
 echo 'ENV_SH_TEST='"${ENV_SH_TEST-}"
 [[ -z "${ENV_SH_TEST-}" ]] && { echo 'FAIL: ENV_SH_TEST is empty.'; exit 1; }
-echo 'test_service_name='"$test_service_name"
-[[ $ENV_SH_TEST != "$test_service_name" ]] && { echo 'FAIL: $ENV_SH_TEST does not equal $test_service_name.'; exit 1; }
+[[ $ENV_SH_TEST != 'test-dynamic-service-loading' ]] && { echo 'FAIL: ENV_SH_TEST does not equal test-dynamic-service-loading.'; exit 1; }
 echo -e "OK\n"
 
-unset ENV_SH_TEST
-[[ -n "${ENV_SH_TEST-}" ]] && { echo 'FAIL: ENV_SH_TEST is still set after unsetting.'; exit 1; }
-
-# Testing disabling service
-# -------------------------
-
-echo "Writing to .env to disable test service by default..."
-echo "$test_service_enable_var_name""=0" > "$ENV_FILE"
-echo 'Env file '"$ENV_FILE"
-cat "$ENV_FILE"
+echo "Testing that service env.sh sees COMPOSE_FILE after the service compose file is added..."
+[[ -z "${TEST_DYNAMIC_SERVICE_LOADING_COMPOSE_FILE_UPDATED-}" ]] && { echo 'FAIL: Service env.sh did not see its compose file in COMPOSE_FILE.'; exit 1; }
 echo -e "OK\n"
 
-echo "Testing service now being disabled..."
-source env.sh
-if [ -n "${ENV_SH_TEST-}" ] ; then
-  echo "FAIL: ENV_SH_TEST env variable is set despite service being disabled."; exit 1
-fi
-echo -e "OK\n"
-
-# Remove current test service and create new one
-# ----------------------------------------------
-
-echo "Removing test service ..."
-rm -rf "$test_service_dir"
-[[ -e "$test_service_dir" ]] && { echo "FAIL: Failed to remove $test_service_dir"; exit 1; }
-
-echo "Creating new service for running tests with random name ..."
-rand="$RANDOM"
-[[ -z "$rand" ]] && echo 'Error: Unable to generate random number: $RANDOM is empty.' && exit 1
-
-test_service_name='test_'"$rand"
-test_service_dir='services/'"$test_service_name"
-[[ -e "$test_service_dir" ]] && echo 'Error: Test service already exists at '"$test_service_dir" && exit 1
-
-echo 'mkdir '"$test_service_dir"
-mkdir -p "$test_service_dir"
-echo -e "OK\n"
-
-# Test docker-compose.yml auto load if exists
-# -------------------------------------------
-
-echo "Writing to .env to enable test service..."
-test_service_enable_var_name="SERVICE_ENABLED_${test_service_name^^}"
-echo "$test_service_enable_var_name""=1" > "$ENV_FILE"
-echo 'Env file '"$ENV_FILE"
-cat "$ENV_FILE"
-echo -e "OK\n"
-
-echo "Testing that COMPOSE_FILE env variable does not contain service's docker-compose.yml..."
-source env.sh
-if [ "$(echo $COMPOSE_FILE | grep $test_service_name)" ]; then
-  echo "Error: COMPOSE_FILE environment variable contains reference to test service, COMPOSE_FILE is: ""$COMPOSE_FILE"; exit 1
-fi
-echo -e "OK\n"
-
-echo "Copying docker-compose.test-dynamic-service-loading.yml as docker-compose.yml"
-service_compose_file="$test_service_dir"'/docker-compose.yml'
-cp 'tests/docker-compose.test-dynamic-service-loading.yml' "$service_compose_file"
-if [ ! -e "$service_compose_file" ]; then
-  echo "Test script error: docker-compose.yml does not exist in ""$test_service_dir"
-  echo "ls -la ""$test_service_dir"":"
-  ls -la "$test_service_dir"
-  exit 1
-fi
-echo -e "OK\n"
+# Test docker-compose.yml auto load
+# ---------------------------------
 
 echo "Testing that COMPOSE_FILE env variable contains path to service's docker-compose.yml..."
-source env.sh
-compose_file_root_rel_path='services/'"$test_service_name"'/docker-compose.yml'
-[[ "$COMPOSE_FILE" != *"$compose_file_root_rel_path"* ]] && { echo "FAIL: \$COMPOSE_FILE does not contain $compose_file_root_rel_path"; exit 1; }
+[[ "$COMPOSE_FILE" != *'services/test-dynamic-service-loading/docker-compose.yml'* ]] && { echo 'FAIL: $COMPOSE_FILE does not contain services/test-dynamic-service-loading/docker-compose.yml'; exit 1; }
 echo -e "OK\n"
 
 echo "Testing docker compose up..."
@@ -139,17 +65,4 @@ docker compose up -d
 [[ "$(docker compose ps)" != *'test-dynamic-service-loading-nginx'* ]] && { echo 'FAIL: Container does not appear to be running, could not find a running container with a name containing "test-dynamic-service-loading-nginx".'; exit 1; }
 echo 'Found running container with the name containing "test-dynamic-service-loading-nginx".'
 docker compose down
-echo -e "OK\n"
-
-# Confirm that env.sh is sourced after COMPOSE_FILE is updated
-# ------------------------------------------------------------
-
-echo "Test that env.sh is sourced after docker-compose.yml is added to COMPOSE_FILE..."
-test_compose_file_updated_var_name="${test_service_name^^}""_COMPOSE_FILE_UPDATED"
-echo '[[ "$COMPOSE_FILE" == *"'"$compose_file_root_rel_path"'"* ]] && export '"$test_compose_file_updated_var_name"'=1' > "$test_service_dir"'/env.sh'
-echo 'Wrote to '"$test_service_dir"'/env.sh:'
-echo "$(<"$test_service_dir/env.sh")"
-source env.sh
-[[ "$(env)" != *"$test_compose_file_updated_var_name"* ]] && { echo "FAIL: After sourcing env.sh $test_compose_file_updated_var_name variable is not set in the environment."; exit 1; }
-echo 'After sourcing env.sh '"$test_compose_file_updated_var_name"' variable is set.'
 echo -e "OK\n"
