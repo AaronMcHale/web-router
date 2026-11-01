@@ -13,7 +13,7 @@ The service loader in the top-level `env.sh` script looks for each of these at t
 
 Services can be enabled and disabled dynamically using environment variables.
 
-The environment variable for enabling or disabling a service always starts with `SERVICE_ENABLED_` followed by the name of the service in upper-case. The name of the service is the name of that service's folder in the `services` directory.
+The environment variable for enabling or disabling a service always starts with `SERVICE_ENABLED_` followed by the name of the service in upper-case, with dashes replaced by underscores. The name of the service is the name of that service's folder in the `services` directory.
 
 The easiest way to set these variables is in a `.env` file at the top-level of web-router. The `.env` file will be loaded automatically when the top-level `env.sh` script is sourced, `env.sh` will then enable and load the relevant services.
 
@@ -27,7 +27,7 @@ Services are disabled by default, unless enabled in a top-level `.env` file. The
 
 Services are loaded dynamically, this means that creating your own services is as simple as creating a new folder in the `services` directory. The top-level `env.sh` script does not need to be changed in any way. When the `env.sh` script at the top level of web-router is sourced it will look in the `services` directory and load all enabled services.
 
-The name of a service is based on the name of the service's folder. When creating a service, avoid the use of spaces and dashes as these may prevent a service from being loaded.
+The name of a service is based on the name of the service's folder. When creating a service, avoid the use of spaces. Dashes are supported and are replaced by underscores in the environment variable used to enable or disable the service.
 
 Continue reading for more information on how to structure a service.
 

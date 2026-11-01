@@ -47,7 +47,8 @@ for service in ./services/*; do
     continue
   fi
   service_name="${service##*/}"
-  service_is_enabled_var_name="SERVICE_ENABLED_""${service_name^^}"
+  service_env_name="${service_name//-/_}"
+  service_is_enabled_var_name="SERVICE_ENABLED_""${service_env_name^^}"
   service_is_enabled=0
   # Check if the `SERVICE_ENABLED_` variable is set for this service.
   # Pipe the output of `env` to `grep` and check for lines starting with
@@ -63,5 +64,5 @@ for service in ./services/*; do
       . "$service""/env.sh"
     fi
   fi
-  unset service_name service_is_enabled_var_name service_is_enabled
+  unset service_name service_env_name service_is_enabled_var_name service_is_enabled
 done
