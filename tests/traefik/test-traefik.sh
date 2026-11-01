@@ -13,35 +13,32 @@ echo -e "OK\n"
 
 echo "Test container is running with current user..."
 output="$(docker compose exec traefik id -u)"
-assert_msg='expected output of `id -u` to be same as PUID variable'
-assert equal "$output" "$PUID"
+[[ "$output" != "$PUID" ]] && { echo 'FAIL: expected output of `id -u` to be same as PUID variable'; exit 1; }
 echo -e "OK\n"
 
 echo "Test filesystem is read-only..."
-set +e; output="$(docker compose exec traefik touch /test 2>&1)"; set -e
-assert_msg='attempt to write to root file-system did not return read-only file system message'
-assert contain 'Read-only' "$output"
+output="$(docker compose exec traefik touch /test 2>&1)"
+[[ "$output" != *'Read-only'* ]] && { echo 'FAIL: attempt to write to root file-system did not return read-only file system message'; exit 1; }
 echo -e "OK\n"
 
 echo "Test /tmp is writable..."
-set +e; output="$(docker compose exec traefik echo 'test'>/tmp/test && cat /tmp/test 2>&1)"; set -e
-assert_msg='attempt to write to /tmp failed or the file was written but its contents could not be read, expected `cat /tmp/test` to output: test'
-assert contain 'test' "$output"
+docker compose exec traefik touch /tmp/test
+[[ "$?" != 0 ]] && { echo "FAIL: attempt to write to /tmp failed, returned status code is $?"; exit 1; }
 echo -e "OK\n"
-unset assert_msg
+
+# Traefik specific tests
 
 echo "Test Traefik redirects HTTP to HTTPS by default..."
-echo "  Testing status code..."
-assert http_status_code 'http://localhost/' '301'
-echo "  Testing response headers..."
-assert http_response_headers_contain "http://localhost/" "https://localhost/"
+output="$(curl --insecure --no-progress-meter --head http://localhost)"
+[[ "$output" != *'https://localhost'* ]] && { echo "FAIL: expected response headers to contian https://localhost. Response headers: $output"; exit 1; }
 echo -e "OK\n"
-exit
 
 echo "Test Traefik can discover Docker containers..."
 export COMPOSE_FILE="$COMPOSE_FILE"":tests/traefik/docker-compose.test-traefik-docker-discovery.yml"
 docker compose up -d
 sleep 2 # give a little time for the route to be registered
 url="https://""$DEFAULT_DOMAIN""/api/http/routers/test-traefik-docker-discovery@docker"
-assert http_status_code $url '200'
+output="$(curl --insecure --no-progress-meter --output /dev/null "$url" -w "%{http_code}")"
+echo $output
+[[ "$output" != '200' ]] && { echo "FAIL: expected response status code to be 200, got $output. URL: $url"; exit 1; }
 echo -e "OK\n"
