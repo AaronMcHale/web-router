@@ -31,12 +31,22 @@ echo -e "OK\n"
 
 echo 'Test Dashboard returns 404 when TRAEFIK_API_DASHBOARD is 0...'
 url="$traefik_url"'/dashboard/'
-assert http_status_code $url '404'
+curl_status=$(curl --insecure --no-progress-meter --output /dev/null "$url" -w "%{http_code}")
+if [ "$curl_status" != '404' ]; then
+  echo "FAIL: Expected response status code to be 404, got $curl_status"
+  echo "URL: $url"
+  exit 1
+fi
 echo -e "OK\n"
 
 echo 'Test API returns 404 when TRAEFIK_API_DASHBOARD is 0...'
 url="$traefik_url"'/api/http/routers'
-assert http_status_code $url '404'
+curl_status=$(curl --insecure --no-progress-meter --output /dev/null "$url" -w "%{http_code}")
+if [ "$curl_status" != '404' ]; then
+  echo "FAIL: Expected response status code to be 404, got $curl_status"
+  echo "URL: $url"
+  exit 1
+fi
 echo -e "OK\n"
 
 echo 'Setup tests for TRAEFIK_API_DASHBOARD=1...'
@@ -51,10 +61,20 @@ echo -e "OK\n"
 
 echo 'Test Dashboard returns 200 when TRAEFIK_API_DASHBOARD is 1...'
 url="$traefik_url"'/dashboard/'
-assert http_status_code $url '200'
+curl_status=$(curl --insecure --no-progress-meter --output /dev/null "$url" -w "%{http_code}")
+if [ "$curl_status" != '200' ]; then
+  echo "FAIL: Expected response status code to be 200, got $curl_status"
+  echo "URL: $url"
+  exit 1
+fi
 echo -e "OK\n"
 
 echo 'Test API returns 200 when TRAEFIK_API_DASHBOARD is 1...'
 url="$traefik_url"'/api/http/routers'
-assert http_status_code $url '200'
+curl_status=$(curl --insecure --no-progress-meter --output /dev/null "$url" -w "%{http_code}")
+if [ "$curl_status" != '200' ]; then
+  echo "FAIL: Expected response status code to be 200, got $curl_status"
+  echo "URL: $url"
+  exit 1
+fi
 echo -e "OK\n"

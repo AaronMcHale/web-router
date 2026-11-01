@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
 # Setup shell for running tests.
-set -euo pipefail
+set -u
 
 # Ensure that any reunning containers are stopped and removed on exit.
 clean_exit() {
-  if [ -x "tests/.env" ]; then rm tests/.env; fi
+  [[ -x "tests/.env" ]] && rm tests/.env
 }
 trap clean_exit EXIT
 
 run_test() {
   echo -e "Running "$1"...\n"
-  bash -c "set -euo pipefail; . asserts.sh; . ""$1"
+  bash -c "set -euo pipefail; source ""$1"
   echo -e "Done\n\n"
 }
 
