@@ -10,10 +10,10 @@
 # Docker CLI and in the compose file we've set the `DOCKER_HOST` environment
 # variable to point to the `traefik-docker-proxy` container.
 
-set -euo pipefail
+set -uo pipefail
 
 echo "Test connection and access is allowed to version command..."
-set +e; output="$(docker version --format='{{json .Server.Components}}' 2>&1)"; set -e
+output="$(docker version --format='{{json .Server.Components}}' 2>&1)"
 if [[ "$output" != *"Version"* ]]; then
   echo 'FAIL: Expected output to contain Version.'
   exit 1
@@ -21,7 +21,7 @@ fi
 echo -e "OK\n"
 
 echo "Test access is allowed to inspect \"pong\" container from \"ping\" container..."
-set +e; output="$(docker container inspect test-traefik-docker-proxy-pong --format='{{json .State }}' 2>&1)"; set -e
+output="$(docker container inspect test-traefik-docker-proxy-pong --format='{{json .State }}' 2>&1)"
 if [[ "$output" != *"running"* ]]; then
   echo 'FAIL: Expected output to contain running.'
   exit 1
@@ -30,12 +30,12 @@ echo -e "OK\n"
 
 echo "Test access is blocked to exec on \"pong\" container from \"ping\" container..."
 # We want to test both `exec` and `container exec` just for peace of mind
-set +e; output="$(docker exec test-traefik-docker-proxy-pong ls 2>&1)"; set -e
+output="$(docker exec test-traefik-docker-proxy-pong ls 2>&1)"
 if [[ "$output" != *"Forbidden"* ]]; then
   echo 'FAIL: Expected output to contain Forbidden.'
   exit 1
 fi
-set +e; output="$(docker container exec test-traefik-docker-proxy-pong ls 2>&1)"; set -e
+output="$(docker container exec test-traefik-docker-proxy-pong ls 2>&1)"
 if [[ "$output" != *"Forbidden"* ]]; then
   echo 'FAIL: Expected output to contain Forbidden.'
   exit 1

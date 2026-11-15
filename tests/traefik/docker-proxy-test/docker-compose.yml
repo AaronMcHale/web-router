@@ -13,12 +13,12 @@
 services:
   test-traefik-docker-proxy-ping:
     build:
-      context: ./tests
+      context: ./tests/traefik/docker-proxy-test
       dockerfile_inline: |
         FROM nginx:alpine
         RUN apk update && apk add bash docker-cli
-        COPY traefik/test-traefik-docker-proxy-in-container-script.sh /
-        RUN chmod +x /test-traefik-docker-proxy-in-container-script.sh
+        COPY test-script.sh /
+        RUN chmod +x /test-script.sh
     environment:
       DOCKER_HOST: 'tcp://traefik-docker-proxy:2375'
     networks: [ traefik_internal ]
